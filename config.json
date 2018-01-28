@@ -1,0 +1,6 @@
+{
+	"prefix": "~",
+	"token": "Discord Bot Token",
+	"rlsapi": "Rocket League Stats API Token",
+	"osuapi": "osu! API Token"
+}
