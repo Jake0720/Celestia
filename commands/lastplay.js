@@ -1,6 +1,7 @@
 const config = require('../config.json');
 const request = require('request');
 const Discord = require('discord.js');
+const osu = require("ojsama");
 
 module.exports = {
     name: 'lastplay',
@@ -89,6 +90,7 @@ module.exports = {
                     let seconds = Number(beatmapInfo["total_length"]) - minutes * 60;
                     const acc = 100*((50*Number(lastPlay["count50"]))+(100*Number(lastPlay["count100"]))+(300*Number(lastPlay["count300"])))/(300*(Number(lastPlay["countmiss"])+Number(lastPlay["count50"])+Number(lastPlay["count100"])+Number(lastPlay["count300"])));
 
+
                     if (response.statusCode != 200) {
                         console.log(response.statusCode);
                     }
@@ -98,6 +100,8 @@ module.exports = {
                     }
 
                     var enabledMods = lastPlay["enabled_mods"];
+					
+					
                     var modsList = [];
                     for (var modValues in Mods) {
                         if (enabledMods >= Mods[modValues]) {
@@ -111,6 +115,53 @@ module.exports = {
                     }
                     modsList = modsList.join();
 
+
+					var acc_percent = acc.toFixed(2);
+					var combo = lastPlay["maxcombo"];
+					var nmiss = lastPlay["countmiss"];
+					
+request.get('http://osu.ppy.sh/osu/' + beatmapInfo["beatmap_id"], function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+        var csv = body;
+		var parser = new osu.parser(csv);
+		   var map = parser.map;
+
+		parser.feed(csv);
+		        var mods = lastPlay["enabled_mods"];
+
+				var acc_percent = acc.toFixed(2);
+				var combo = lastPlay["maxcombo"];
+				var nmiss = lastPlay["countmiss"];
+
+
+
+    if (mods) {
+        console.log("+" + osu.modbits.string(mods));
+    }
+
+    var stars = new osu.diff().calc({map: map, mods: mods});
+    console.log(stars.toString());
+	
+    var pp = osu.ppv2({
+        stars: stars,
+        combo: combo,
+        nmiss: nmiss,
+        acc_percent: acc_percent,
+    });
+
+    var max_combo = map.max_combo();
+    combo = combo || max_combo;
+
+    console.log(pp.computed_accuracy.toString());
+    console.log(combo + "/" + max_combo + "x");
+
+    console.log(pp.toString());
+	
+	
+		console.log(osu.ppv2({map: parser.map}).toString());
+    }
+});
+					
                     try {
                         const embed = new Discord.RichEmbed()
                             .setAuthor(`${stats["username"]}`, 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png', `https://osu.ppy.sh/u/${stats["user_id"]}`)
