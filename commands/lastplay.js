@@ -1,7 +1,7 @@
 const config = require('../config.json');
 const request = require('request');
 const Discord = require('discord.js');
-const osu = require("ojsama");
+const osu = require('ojsama');
 
 module.exports = {
     name: 'lastplay',
@@ -90,7 +90,6 @@ module.exports = {
                     let seconds = Number(beatmapInfo["total_length"]) - minutes * 60;
                     const acc = 100*((50*Number(lastPlay["count50"]))+(100*Number(lastPlay["count100"]))+(300*Number(lastPlay["count300"])))/(300*(Number(lastPlay["countmiss"])+Number(lastPlay["count50"])+Number(lastPlay["count100"])+Number(lastPlay["count300"])));
 
-
                     if (response.statusCode != 200) {
                         console.log(response.statusCode);
                     }
@@ -99,97 +98,89 @@ module.exports = {
                         console.log(error);
                     }
 
-                    var enabledMods = lastPlay["enabled_mods"];
-					
-					
-                    var modsList = [];
-                    for (var modValues in Mods) {
-                        if (enabledMods >= Mods[modValues]) {
-                            enabledMods = enabledMods - Mods[modValues];
-                            modsList.push(modValues)
-                            if (enabledMods == 0) {
-                                break;
-                            }
+                    request('http://osu.ppy.sh/osu/' + beatmapInfo["beatmap_id"], (error, response, body) => {
+                        if (!error && response.statusCode == 200) {
+                            var csv = body;
+                            var parser = new osu.parser(csv);
+                            var map = parser.map;
+
+                            parser.feed(csv);
+                            var mods = lastPlay["enabled_mods"];
+
+                            var acc_percent = acc.toFixed(2);
+                            var combo = lastPlay["maxcombo"];
+                            var nmiss = lastPlay["countmiss"];
                         }
 
-                    }
-                    modsList = modsList.join();
 
+                        if (mods) {
+                            console.log("+" + osu.modbits.string(mods));
+                        }
 
-					var acc_percent = acc.toFixed(2);
-					var combo = lastPlay["maxcombo"];
-					var nmiss = lastPlay["countmiss"];
-					
-request.get('http://osu.ppy.sh/osu/' + beatmapInfo["beatmap_id"], function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-        var csv = body;
-		var parser = new osu.parser(csv);
-		   var map = parser.map;
+                        var stars = new osu.diff().calc({map: map, mods: mods});
+                        console.log(stars.toString());
+                        
+                        var pp = osu.ppv2({
+                            stars: stars,
+                            combo: combo,
+                            nmiss: nmiss,
+                            acc_percent: acc_percent,
+                        });
 
-		parser.feed(csv);
-		        var mods = lastPlay["enabled_mods"];
+                        var max_combo = map.max_combo();
+                        combo = combo || max_combo;
 
-				var acc_percent = acc.toFixed(2);
-				var combo = lastPlay["maxcombo"];
-				var nmiss = lastPlay["countmiss"];
+                        console.log(pp.computed_accuracy.toString());
+                        console.log(combo + "/" + max_combo + "x");
 
+                        console.log(pp.toString());
+                        
+                        
+                        console.log(osu.ppv2({map: parser.map}).toString());
+                    
+                        var enabledMods = lastPlay["enabled_mods"];
+                        var modsList = [];
+                        for (var modValues in Mods) {
+                            if (enabledMods >= Mods[modValues]) {
+                                enabledMods = enabledMods - Mods[modValues];
+                                modsList.push(modValues)
+                                if (enabledMods == 0) {
+                                    break;
+                                }
+                            }
 
+                        }
+                        modsList = modsList.join();
 
-    if (mods) {
-        console.log("+" + osu.modbits.string(mods));
-    }
+                        try {
+                            const embed = new Discord.RichEmbed()
+                                .setAuthor(`${stats["username"]}`, 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png', `https://osu.ppy.sh/u/${stats["user_id"]}`)
+                                .setURL(`https://osu.ppy.sh/u/${lastPlay["user_id"]}`)
+                                .setColor('#E3609A')
+                                .setDescription(`Recently played by [${stats["username"]}](https://osu.ppy.sh/u/${lastPlay["user_id"]}) (#${stats["pp_rank"]}).`)
+                                .addField('Beatmap', `[${beatmapInfo["artist"]} - ${beatmapInfo["title"]} (${beatmapInfo["version"]})](https://osu.ppy.sh/b/${beatmapInfo["beatmap_id"]})`
+                                            +`\nStars: ${Number(beatmapInfo["difficultyrating"]).toFixed(2)}`
+                                            +` | BPM: ${beatmapInfo["bpm"]}`
+                                            +` | AR: ${beatmapInfo["diff_approach"]}`
+                                            +` | HP: ${beatmapInfo["diff_drain"]}`
+                                            +` | CS: ${beatmapInfo["diff_size"]}`
+                                            +` | OD: ${beatmapInfo["diff_overall"]}`
+                                            +`\nLength: ${minutes}m${seconds}s`)
+                                .addField('Stats', `**Rank:** ${lastPlay["rank"]}`
+                                            +`\n**Score:** ${lastPlay["score"]}`
+                                            +`\n**Max Combo:** ${lastPlay["maxcombo"]}/${beatmapInfo['max_combo']}`
+                                            +`\n**Mods:** ${modsList}`, true)
+                                .addField('WIP', `**PP:** coming eventually`, true)
+                                .addField('Accuracy', `${acc.toFixed(2)}% | <:300:404610091804000276>: ${lastPlay["count300"]}  <:100:404610089282961419>: ${lastPlay["count100"]}  <:50:404610083658399745>: ${lastPlay["count50"]}  <:miss:404610089899786240>: ${lastPlay["countmiss"]}`)
+                                .setFooter('osu! latest play')
+                                .setThumbnail(`https://a.ppy.sh/${stats["user_id"]}`);
 
-    var stars = new osu.diff().calc({map: map, mods: mods});
-    console.log(stars.toString());
-	
-    var pp = osu.ppv2({
-        stars: stars,
-        combo: combo,
-        nmiss: nmiss,
-        acc_percent: acc_percent,
-    });
-
-    var max_combo = map.max_combo();
-    combo = combo || max_combo;
-
-    console.log(pp.computed_accuracy.toString());
-    console.log(combo + "/" + max_combo + "x");
-
-    console.log(pp.toString());
-	
-	
-		console.log(osu.ppv2({map: parser.map}).toString());
-    }
-});
-					
-                    try {
-                        const embed = new Discord.RichEmbed()
-                            .setAuthor(`${stats["username"]}`, 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png', `https://osu.ppy.sh/u/${stats["user_id"]}`)
-                            .setURL(`https://osu.ppy.sh/u/${lastPlay["user_id"]}`)
-                            .setColor('#E3609A')
-                            .setDescription(`Recently played by [${stats["username"]}](https://osu.ppy.sh/u/${lastPlay["user_id"]}) (#${stats["pp_rank"]}).`)
-                            .addField('Beatmap', `[${beatmapInfo["artist"]} - ${beatmapInfo["title"]} (${beatmapInfo["version"]})](https://osu.ppy.sh/b/${beatmapInfo["beatmap_id"]})`
-                                        +`\nStars: ${Number(beatmapInfo["difficultyrating"]).toFixed(2)}`
-                                        +` | BPM: ${beatmapInfo["bpm"]}`
-                                        +` | AR: ${beatmapInfo["diff_approach"]}`
-                                        +` | HP: ${beatmapInfo["diff_drain"]}`
-                                        +` | CS: ${beatmapInfo["diff_size"]}`
-                                        +` | OD: ${beatmapInfo["diff_overall"]}`
-                                        +`\nLength: ${minutes}m${seconds}s`)
-                            .addField('Stats', `**Rank:** ${lastPlay["rank"]}`
-                                        +`\n**Score:** ${lastPlay["score"]}`
-                                        +`\n**Max Combo:** ${lastPlay["maxcombo"]}/${beatmapInfo['max_combo']}`
-                                        +`\n**Mods:** ${modsList}`, true)
-                            .addField('WIP', `**PP:** coming eventually`, true)
-                            .addField('Accuracy', `%${acc.toFixed(2)} | <:300:404610091804000276>: ${lastPlay["count300"]}  <:100:404610089282961419>: ${lastPlay["count100"]}  <:50:404610083658399745>: ${lastPlay["count50"]}  <:miss:404610089899786240>: ${lastPlay["countmiss"]}`)
-                            .setFooter('osu! latest play')
-                            .setThumbnail(`https://a.ppy.sh/${stats["user_id"]}`);
-
-                        message.channel.send(embed);
-                    }
-                    catch(err) {
-                        message.channel.send(`***Error.***\n\`\`\`js\n${err}\n\`\`\``);
-                    }
+                            message.channel.send(embed);
+                        }
+                        catch(err) {
+                            message.channel.send(`***Error.***\n\`\`\`js\n${err}\n\`\`\``);
+                        }
+                    }); 
                 });
             });
         });
