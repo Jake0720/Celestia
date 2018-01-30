@@ -99,8 +99,9 @@ module.exports = {
                         console.log(error);
                     }
 
-                    var enabledMods = lastPlay["enabled_mods"];
-					
+                    var enabledMods = parseInt(lastPlay["enabled_mods"]);
+					var mods = parseInt(lastPlay["enabled_mods"]);
+					console.log(mods);
 					
                     var modsList = [];
                     for (var modValues in Mods) {
@@ -120,27 +121,24 @@ module.exports = {
 					var combo = lastPlay["maxcombo"];
 					var nmiss = lastPlay["countmiss"];
 					
-request.get('http://osu.ppy.sh/osu/' + beatmapInfo["beatmap_id"], function (error, response, body) {
+				request.get('http://osu.ppy.sh/osu/' + lastPlay["beatmap_id"], function (error, response, body) {
     if (!error && response.statusCode == 200) {
         var csv = body;
 		var parser = new osu.parser(csv);
 		   var map = parser.map;
 
 		parser.feed(csv);
-		        var mods = lastPlay["enabled_mods"];
-
-				var acc_percent = acc.toFixed(2);
-				var combo = lastPlay["maxcombo"];
-				var nmiss = lastPlay["countmiss"];
-
-
-
+		
+				acc_percent = acc;
+				combo = parseInt(lastPlay["maxcombo"]);
+				nmiss = parseInt(lastPlay["countmiss"]);
     if (mods) {
         console.log("+" + osu.modbits.string(mods));
     }
 
     var stars = new osu.diff().calc({map: map, mods: mods});
-    console.log(stars.toString());
+	
+	combo = map.max_combo();
 	
     var pp = osu.ppv2({
         stars: stars,
@@ -152,13 +150,11 @@ request.get('http://osu.ppy.sh/osu/' + beatmapInfo["beatmap_id"], function (erro
     var max_combo = map.max_combo();
     combo = combo || max_combo;
 
-    console.log(pp.computed_accuracy.toString());
-    console.log(combo + "/" + max_combo + "x");
+
 
     console.log(pp.toString());
 	
 	
-		console.log(osu.ppv2({map: parser.map}).toString());
     }
 });
 					
