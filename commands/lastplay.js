@@ -140,6 +140,10 @@ module.exports = {
 
                         var max_combo = map.max_combo();
                         combo = combo || max_combo;
+
+                        if (lastPlay["rank"] == "F") {
+                            pp = "Failed.";
+                        }
                     
                         try {
                             const embed = new Discord.RichEmbed()
