@@ -47,6 +47,18 @@ module.exports = {
             None: 0
         }
 
+        var ranks = {
+            SSH: "",
+            SS: "",
+            SH: "",
+            S: "",
+            A: "",
+            B: "",
+            C: "",
+            D: "",
+            F: ""
+        }
+
         request(`https://osu.ppy.sh/api/get_user?k=${config.osuapi}&u=${args}`, (error, response, body) => {
             let stats = JSON.parse(body)[0];
 
@@ -108,7 +120,7 @@ module.exports = {
                     var combo = lastPlay["maxcombo"];
                     var nmiss = lastPlay["countmiss"];
                     
-                    request('http://osu.ppy.sh/osu/' + lastPlay["beatmap_id"], function (error, response, body) {
+                    request(`http://osu.ppy.sh/osu/${lastPlay["beatmap_id"]}`, (error, response, body) => {
                         if (response.statusCode != 200) {
                             console.log(response.statusCode);
                         }
@@ -164,9 +176,10 @@ module.exports = {
                                             +`\n**Max Combo:** ${lastPlay["maxcombo"]}/${beatmapInfo['max_combo']}`, true)
                                 .addField('\u200b', `**Mods:** ${modsList}`
                                             +`\n**PP:** ${pp.toString().slice(0,6)}`, true)
-                                .addField('Accuracy', `${acc.toFixed(2)}% | <:300:404610091804000276>: ${lastPlay["count300"]}  <:100:404610089282961419>: ${lastPlay["count100"]}  <:50:404610083658399745>: ${lastPlay["count50"]}  <:miss:404610089899786240>: ${lastPlay["countmiss"]}`)
+                                .addField('Accuracy', `${acc.toFixed(2)}%  <:300:404610091804000276>: ${lastPlay["count300"]}  <:100:404610089282961419>: ${lastPlay["count100"]}  <:50:404610083658399745>: ${lastPlay["count50"]}  <:miss:404610089899786240>: ${lastPlay["countmiss"]}`)
                                 .setFooter('osu! latest play')
-                                .setThumbnail(`https://a.ppy.sh/${stats["user_id"]}`);
+                                .setThumbnail(`https://b.ppy.sh/thumb/${beatmapInfo["beatmapset_id"]}l.jpg`)
+                                //.setThumbnail(`${ranks[lastPlay["rank"]]}`);
 
                             message.channel.send(embed);
                         }

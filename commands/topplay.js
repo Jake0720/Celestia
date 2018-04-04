@@ -123,7 +123,7 @@ module.exports = {
                                         +`\n**Max Combo:** ${topPlay["maxcombo"]}/${beatmapInfo["max_combo"]}`, true)
                             .addField('\u200b', `**Mods:** ${modsList}`
                                         +`\n**PP:** ${topPlay["pp"]}`, true)
-                            .addField('Accuracy', `%${acc.toFixed(2)}  <:300:404610091804000276>: ${topPlay["count300"]}  <:100:404610089282961419>: ${topPlay["count100"]}  <:50:404610083658399745>: ${topPlay["count50"]}  <:miss:404610089899786240>: ${topPlay["countmiss"]}`)
+                            .addField('Accuracy', `${acc.toFixed(2)}%  <:300:404610091804000276>: ${topPlay["count300"]}  <:100:404610089282961419>: ${topPlay["count100"]}  <:50:404610083658399745>: ${topPlay["count50"]}  <:miss:404610089899786240>: ${topPlay["countmiss"]}`)
                             .setFooter('osu! top play')
                             .setThumbnail(`https://a.ppy.sh/${stats["user_id"]}`);
 
