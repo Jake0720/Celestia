@@ -116,9 +116,7 @@ module.exports = {
                     modsList = modsList.join();
 
 
-                    var acc_percent = acc.toFixed(2);
-                    var combo = lastPlay["maxcombo"];
-                    var nmiss = lastPlay["countmiss"];
+                    
                     
                     request(`http://osu.ppy.sh/osu/${lastPlay["beatmap_id"]}`, (error, response, body) => {
                         if (response.statusCode != 200) {
@@ -135,13 +133,12 @@ module.exports = {
 
                         parser.feed(csv);
                         
-                        acc_percent = acc;
-                        combo = parseInt(lastPlay["maxcombo"]);
-                        nmiss = parseInt(lastPlay["countmiss"]);
+						var acc_percent = parseFloat(acc.toFixed(2)); 
+						var combo = parseInt(lastPlay["maxcombo"]);
+                        var nmiss = parseInt(lastPlay["countmiss"]);
 
                         var stars = new osu.diff().calc({map: map, mods: mods});
-                        
-                        combo = map.max_combo();
+                        var max_combo = map.max_combo();
                         
                         var pp = osu.ppv2({
                             stars: stars,
@@ -150,7 +147,6 @@ module.exports = {
                             acc_percent: acc_percent,
                         });
 
-                        var max_combo = map.max_combo();
                         combo = combo || max_combo;
 
                         if (lastPlay["rank"] == "F") {
