@@ -18,7 +18,6 @@ execute(message, args) {
 	}
 	
 	args = args.join('%20');
-
 	
 	//no reason to have them so spaced out, we wont ever change values...
 	var Mods = {Key2: 268435456, Key3: 134217728, Key1: 67108864, Key10: 33554432, Key9: 16777216,
@@ -26,25 +25,15 @@ execute(message, args) {
 		Key5: 65536, Key4: 32768, PF: 16384, Relax2: 8192, SpunOut: 4096, Autoplay: 2048, FL: 1024,
 		NC: 512, HT: 256, Relax: 128, DT: 64, SD: 32, HR: 16, HD: 8, NoVideo: 4, EZ: 2, NF: 1,None: 0};
 
-	var ranks = {SSH: "",
-		SS: "",
-		SH: "",
-		S: "",
-		A: "",
-		B: "",
-		C: "",
-		D: "",
-		F: ""}
-
+	var ranks = {SSH: "", SS: "", SH: "", S: "", A: "", B: "", C: "", D: "", F: ""};
 
 	request(`https://osu.ppy.sh/api/get_user?k=${config.osuapi}&u=${args}`, (error, response, body) => {
-	let stats = JSON.parse(body)[0];
+		let stats = JSON.parse(body)[0];
 
-	if (response.statusCode != 200) 
-		console.log(response.statusCode);
-
-	if (error) 
-		console.log(error);
+		if (response.statusCode != 200) 
+			console.log(response.statusCode);
+		if (error) 
+			console.log(error);
 		
 
 	request(`https://osu.ppy.sh/api/get_user_recent?k=${config.osuapi}&u=${args}&limit=1`, (error, response, body) => {
@@ -55,7 +44,6 @@ execute(message, args) {
 
 		if (response.statusCode != 200) 
 			console.log(response.statusCode);
-		
 		if (error) 
 			console.log(error);
 			
@@ -74,7 +62,6 @@ execute(message, args) {
 
 		if (response.statusCode != 200) 
 			console.log(response.statusCode);
-
 		if (error) 
 			console.log(error);
 		
@@ -112,7 +99,6 @@ execute(message, args) {
 		var combo = parseInt(lastPlay["maxcombo"]);
 		var nmiss = parseInt(lastPlay["countmiss"]);
 
-		//----mods don't affect star rating----
 		var stars = new osu.diff().calc({map: map, mods: mods});
 		var max_combo = map.max_combo();
 		
@@ -128,15 +114,12 @@ execute(message, args) {
 		if (lastPlay["rank"] == "F") 
 			pp = "Failed.";
 	
-
-		
 		if(modsList.indexOf("HR") != -1){
 			beatmap_cs = beatmap_cs * 1.3;
 			beatmap_hp = beatmap_hp * 1.4;
 			beatmap_ar = beatmap_ar * 1.4;
 			if(beatmap_ar > 10)
 				beatmap_ar = 10;
-			
 		}
 		
 		if(modsList.indexOf("DT") != -1){
@@ -146,15 +129,12 @@ execute(message, args) {
 			beatmap_ar += "▴";
 			beatmap_od += "▴";
 			beatmap_hp += "▴";
-			stars += "▴";
 		}
+		//todo ez+ht
 		
 		let minutes = Math.floor(beatmap_length / 60);
 		let seconds = beatmap_length - (minutes * 60);
-		
-		console.log(minutes);
-		console.log(seconds);
-		
+
 		try {
 			const embed = new Discord.RichEmbed()
 				.setAuthor(`${stats["username"]}`, 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png', `https://osu.ppy.sh/u/${stats["user_id"]}`)
