@@ -13,13 +13,11 @@ needsArgs: true,
 usage: '<osu username>',
 
 execute(message, args) {
-	if (args.length == 0) {
+	if (args.length == 0)
 		return message.channel.send('Please use a valid osu! username.');
-	}
 	
 	args = args.join('%20');
 	
-	//no reason to have them so spaced out, we wont ever change values...
 	var Mods = {Key2: 268435456, Key3: 134217728, Key1: 67108864, Key10: 33554432, Key9: 16777216,
 		LastMod: 4194304, Random: 2097152, FadeIn: 1048576, Key8: 524288, Key7: 262144,	Key6: 131072,
 		Key5: 65536, Key4: 32768, PF: 16384, Relax2: 8192, SpunOut: 4096, Autoplay: 2048, FL: 1024,
@@ -29,26 +27,20 @@ execute(message, args) {
 
 	request(`https://osu.ppy.sh/api/get_user?k=${config.osuapi}&u=${args}`, (error, response, body) => {
 		let stats = JSON.parse(body)[0];
-
-		if (response.statusCode != 200) 
-			console.log(response.statusCode);
-		if (error) 
-			console.log(error);
+		if (response.statusCode != 200) console.log(response.statusCode);
+		if (error) console.log(error);
 		
-
 	request(`https://osu.ppy.sh/api/get_user_recent?k=${config.osuapi}&u=${args}&limit=1`, (error, response, body) => {
 		let lastPlay = JSON.parse(body)[0];
-
 		if (lastPlay == undefined) 
 			return message.channel.send('This user has not played recently or you have entered an invalid username.');
-
-		if (response.statusCode != 200) 
-			console.log(response.statusCode);
-		if (error) 
-			console.log(error);
+		if (response.statusCode != 200) console.log(response.statusCode);
+		if (error) 	console.log(error);
 			
-
 	request(`https://osu.ppy.sh/api/get_beatmaps?k=${config.osuapi}&b=${lastPlay["beatmap_id"]}`, (error, response, body) => {
+		if (response.statusCode != 200)	console.log(response.statusCode);
+		if (error) console.log(error);
+		
 		let beatmapInfo = JSON.parse(body)[0];
 		
 		let beatmap_bpm = beatmapInfo["bpm"]
@@ -60,11 +52,6 @@ execute(message, args) {
 
 		const acc = 100*((50*Number(lastPlay["count50"]))+(100*Number(lastPlay["count100"]))+(300*Number(lastPlay["count300"])))/(300*(Number(lastPlay["countmiss"])+Number(lastPlay["count50"])+Number(lastPlay["count100"])+Number(lastPlay["count300"])));
 
-		if (response.statusCode != 200) 
-			console.log(response.statusCode);
-		if (error) 
-			console.log(error);
-		
 		var enabledMods = parseInt(lastPlay["enabled_mods"]);
 		var mods = parseInt(lastPlay["enabled_mods"]);
 		
@@ -72,7 +59,7 @@ execute(message, args) {
 		for (var modValues in Mods) {
 			if (enabledMods >= Mods[modValues]) {
 				enabledMods = enabledMods - Mods[modValues];
-				modsList.push(modValues)
+				modsList.push(modValues);
 				if (enabledMods == 0) {
 					break;
 				}
@@ -81,13 +68,9 @@ execute(message, args) {
 		}
 		modsList = modsList.join();
 
-			
 	request(`http://osu.ppy.sh/osu/${lastPlay["beatmap_id"]}`, (error, response, body) => {
-		if (response.statusCode != 200) 
-			console.log(response.statusCode);
-		
-		if (error) 
-			console.log(error);
+		if (response.statusCode != 200) console.log(response.statusCode);
+		if (error) console.log(error);
 		
 		var csv = body;
 		var parser = new osu.parser(csv);
@@ -101,36 +84,37 @@ execute(message, args) {
 
 		var stars = new osu.diff().calc({map: map, mods: mods});
 		var max_combo = map.max_combo();
-		
 		var pp = osu.ppv2({
 			stars: stars,
 			combo: combo,
 			nmiss: nmiss,
 			acc_percent: acc_percent,
 		});
-
+		
 		combo = combo || max_combo;
-
+		
 		if (lastPlay["rank"] == "F") 
 			pp = "Failed.";
 	
 		if(modsList.indexOf("HR") != -1){
-			beatmap_cs = beatmap_cs * 1.3;
-			beatmap_hp = beatmap_hp * 1.4;
+			beatmap_cs = (beatmap_cs * 1.3).toFixed(1);
+			beatmap_hp = (beatmap_hp * 1.4).toFixed(1);
 			beatmap_ar = beatmap_ar * 1.4;
 			if(beatmap_ar > 10)
 				beatmap_ar = 10;
+			
 		}
 		
 		if(modsList.indexOf("DT") != -1){
-			//the fact that it does the right operation is stupid
 			beatmap_bpm = beatmap_bpm * 1.5;
 			beatmap_length = beatmap_length / 1.5;
 			beatmap_ar += "▴";
 			beatmap_od += "▴";
 			beatmap_hp += "▴";
 		}
-		//todo ez+ht
+		//ezht
+		
+		
 		
 		let minutes = Math.floor(beatmap_length / 60);
 		let seconds = beatmap_length - (minutes * 60);
