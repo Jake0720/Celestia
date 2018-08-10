@@ -3,7 +3,6 @@ const request = require('request');
 const Discord = require('discord.js');
 const osu = require("ojsama");
 
-//making cleaner.. or trying..
 
 module.exports = {
 name: 'lastplay',
@@ -112,19 +111,15 @@ execute(message, args) {
 			beatmap_od += "▴";
 			beatmap_hp += "▴";
 		}
-		//ezht
-		
-		
 		
 		let minutes = Math.floor(beatmap_length / 60);
-		let seconds = beatmap_length - (minutes * 60);
+		let seconds = Math.round(beatmap_length - (minutes * 60));
 
 		try {
 			const embed = new Discord.RichEmbed()
-				.setAuthor(`${stats["username"]}`, 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png', `https://osu.ppy.sh/u/${stats["user_id"]}`)
+				.setAuthor(`Recently played by ${stats["username"]} (#${stats["pp_rank"]})`, 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Osu%21Logo_%282015%29.png', `https://osu.ppy.sh/u/${stats["user_id"]}`)
 				.setURL(`https://osu.ppy.sh/u/${lastPlay["user_id"]}`)
 				.setColor('#E3609A')
-				.setDescription(`Recently played by [${stats["username"]}](https://osu.ppy.sh/u/${lastPlay["user_id"]}) (#${stats["pp_rank"]}).`)
 				.addField('Beatmap', `[${beatmapInfo["artist"]} - ${beatmapInfo["title"]} (${beatmapInfo["version"]})](https://osu.ppy.sh/b/${beatmapInfo["beatmap_id"]})`
 							+`\nStars: ${String(stars).substring(0, 4)}`
 							+` | BPM: ${beatmap_bpm}`
