@@ -14,15 +14,15 @@ module.exports = {
     usage: '<attachment> / <png/jpg link>',
     execute(message, args) {
 
-        function getTime(time) {
-            var num = parseInt(time, 10);
-            var hours = Math.floor(num / 3600);
-            var mins = Math.floor((num - (hours * 3600)) / 60);
-            var secs = num - (hours * 3600) - (mins * 60);
-            if(hours < 10) { hours = "0" + hours; }
-            if(mins < 10) { minutes = "0" + mins; }
-            if(secs < 10) { seconds = "0" + secs; }
-            return `${hours}:${mins}:${secs}`
+        function getTime(secs) {
+            var sec_num = parseInt(secs, 10)    
+            var hours   = Math.floor(sec_num / 3600) % 24
+            var minutes = Math.floor(sec_num / 60) % 60
+            var seconds = sec_num % 60    
+            return [hours,minutes,seconds]
+                .map(v => v < 10 ? "0" + v : v)
+                .filter((v,i) => v !== "00" || i > 0)
+                .join(":")
         }
 
         const urlRegex = /(https?:\/\/.*\.(?:png|jpg))/i;
