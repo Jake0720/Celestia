@@ -35,7 +35,7 @@ module.exports = {
         } else {
             message.channel.send('Please pass in a valid argument. Must be either a .png or .jpg.');
         }
-
+        
         async function getImage() {
             const { body: imageBuffer } = await get(url, { encoding: null })
             const { body: result } = await post('https://trace.moe/api/search', {
