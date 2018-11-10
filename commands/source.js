@@ -51,7 +51,7 @@ module.exports = {
             .setAuthor(`Anime Image Index Lookup`)
             .setDescription(`[Anilist Entry](https://anilist.co/anime/${result.docs[0].anilist_id})・[MyAnimeList Entry](https://myanimelist.net/anime/${result.docs[0].mal_id}/${result.docs[0].title_romaji.split(' ').join('_')})`)
             .setColor('#9391b9')
-            .addField("Japenese Title", result.docs[0].title)
+            .addField("Japanese Title", result.docs[0].title)
             .addField("Romaji Title", result.docs[0].title_romaji)
             .addField("English Title", result.docs[0].title_english)
             .addField("MyAnimeList ID", result.docs[0].mal_id)
