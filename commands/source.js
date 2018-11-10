@@ -45,7 +45,7 @@ module.exports = {
               }
             });
 
-        if(!result.docs) { message.channel.send('No results found.'); }
+        if(!result.docs) { message.channel.send('Either no results were found, or your image size is greater than 1Mb.'); }
     
         const embed = new Discord.RichEmbed()
             .setAuthor(`Anime Image Index Lookup`)
