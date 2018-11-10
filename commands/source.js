@@ -7,7 +7,7 @@ var get = util.promisify(request.get);
 var post = util.promisify(request.post);
 
 module.exports = {
-    name: 'whatanime',
+    name: 'source',
     description: 'Reverse image search for anime scenes.',
     args: false,
     needsArgs: false,
