@@ -54,7 +54,6 @@ module.exports = {
             .addField("Japanese Title", result.docs[0].title)
             .addField("Romaji Title", result.docs[0].title_romaji)
             .addField("English Title", result.docs[0].title_english)
-            .addField("MyAnimeList ID", result.docs[0].mal_id)
             .setImage(`https://trace.moe/thumbnail.php?anilist_id=${result.docs[0].anilist_id}&file=${encodeURIComponent(result.docs[0].filename)}&t=${result.docs[0].at}&token=${result.docs[0].tokenthumb}`)
             .setFooter(`Season start ${result.docs[0].season}, Episode ${result.docs[0].episode} at ${getTime(result.docs[0].at)}`)
 
