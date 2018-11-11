@@ -15,10 +15,10 @@ module.exports = {
     execute(message, args) {
 
         function getTime(secs) {
-            var sec_num = parseInt(secs, 10)    
+	    var sec_num = parseInt(secs, 10)
             var hours   = Math.floor(sec_num / 3600) % 24
             var minutes = Math.floor(sec_num / 60) % 60
-            var seconds = sec_num % 60    
+            var seconds = sec_num % 60
             return [hours,minutes,seconds]
                 .map(v => v < 10 ? "0" + v : v)
                 .filter((v,i) => v !== "00" || i > 0)
@@ -35,18 +35,17 @@ module.exports = {
         } else {
             message.channel.send('Please pass in a valid argument. Must be either a .png or .jpg.');
         }
-        
+
         async function getImage() {
             const { body: imageBuffer } = await get(url, { encoding: null })
-            const { body: result } = await post('https://trace.moe/api/search', {
+            const { body: result } = await post(`https://trace.moe/api/search?token=${config.traceapi}`, {
               json: true,
               formData: {
                 image: `data:image/jpeg;base64,${imageBuffer.toString('base64')}`
               }
             });
+        if(!result.docs) { message.channel.send('Either no results were found, the image isn\'t a full frame image, or an error occured.'); }
 
-        if(!result.docs) { message.channel.send('Either no results were found, or your image size is greater than 1MB.'); }
-    
         const embed = new Discord.RichEmbed()
             .setAuthor(`Anime Image Index Lookup`)
             .setDescription(`[Anilist Entry](https://anilist.co/anime/${result.docs[0].anilist_id})・[MyAnimeList Entry](https://myanimelist.net/anime/${result.docs[0].mal_id}/${result.docs[0].title_romaji.split(' ').join('_')})`)
