@@ -6,7 +6,7 @@ module.exports = {
     description: 'Returns info about a given show from MyAnimeList',
     args: true,
     needsArgs: true,
-    usage: 'anime <query>',
+    usage: '<query>',
     execute(message, args) {
         const query = args.join(' ');
         const url = `https://api.jikan.moe/v3/search/anime?q=${encodeURIComponent(query)}` 
