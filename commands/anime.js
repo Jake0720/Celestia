@@ -15,6 +15,7 @@ module.exports = {
             const numFormat = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             const startDate = new Date(result.start_date).toLocaleDateString();
             const endDate = new Date(result.end_date).toLocaleDateString();
+            const theDate = result.airing ? 'Currently airing' : endDate;
             const color = result.airing ? 0x00FF04 : 0xFF0000;
 
             const embed = new Discord.RichEmbed()
@@ -23,7 +24,7 @@ module.exports = {
                 .setDescription(result.synopsis)
                 .addField('Episodes', result.episodes)
                 .addField('Rating', result.rated)
-                .addField('Aired From', `${startDate} - ${endDate}`)
+                .addField('Aired From', `${startDate} - ${theDate}`)
                 .setFooter(`Members: ${numFormat(result.members)}・Score: ${result.score}`)
                 .setThumbnail(result.image_url)
                 .setColor(color)
