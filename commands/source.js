@@ -54,7 +54,7 @@ module.exports = {
             .addField("Romaji Title", result.docs[0].title_romaji)
             .addField("English Title", result.docs[0].title_english)
             .setImage(`https://trace.moe/thumbnail.php?anilist_id=${result.docs[0].anilist_id}&file=${encodeURIComponent(result.docs[0].filename)}&t=${result.docs[0].at}&token=${result.docs[0].tokenthumb}`)
-            .setFooter(`Season start ${result.docs[0].season}, Episode ${result.docs[0].episode} at ${getTime(result.docs[0].at)}`)
+            .setFooter(`Season start ${result.docs[0].season}, Episode ${result.docs[0].episode} at ${getTime(result.docs[0].at)} ・ Powered by trace.moe`)
 
             message.channel.send(embed);
           }
